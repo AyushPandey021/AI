@@ -1,8 +1,8 @@
 import express from "express";
-import { handleAI } from "../controllers/aiController.js";
+import { generateText } from "../controllers/aiController.js";
 
 const router = express.Router();
 
-router.post("/", handleAI);
+router.post("/", generateText);
 
 export default router;

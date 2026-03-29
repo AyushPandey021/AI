@@ -14,6 +14,10 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+// test
+app.get("/",(req,res)=>{
+res.send("hello working💣")
+})
 
 app.use("/api/ai", aiRoutes);
 app.use("/api/doc", docRoutes);
