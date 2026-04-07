@@ -8,6 +8,8 @@ export default function Doc() {
   const [loading, setLoading] = useState(false);
   const [voices, setVoices] = useState([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [question, setQuestion] = useState("");
+const [chat, setChat] = useState([]);
 
   // 🔥 Load voices properly
   useEffect(() => {
@@ -92,6 +94,30 @@ export default function Doc() {
     setIsSpeaking(false);
   };
 
+  const handleAsk = async () => {
+  if (!question) return;
+
+  const res = await fetch("http://localhost:8000/api/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      question,
+      context: summary, // 🔥 doc summary as context
+    }),
+  });
+
+  const data = await res.json();
+
+  setChat([
+    ...chat,
+    { type: "user", text: question },
+    { type: "ai", text: data.answer },
+  ]);
+
+  setQuestion("");
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-6">
 
@@ -150,6 +176,44 @@ export default function Doc() {
           <p className="leading-relaxed">{summary}</p>
         )}
       </div>
+      {/* 🔥 CHAT SECTION */}
+<div className="mt-6 bg-white/10 p-4 rounded-lg">
+
+  <h2 className="text-xl mb-3">💬 Ask Document</h2>
+
+  {/* Chat messages */}
+  <div className="h-60 overflow-y-auto mb-3 space-y-2">
+    {chat.map((msg, i) => (
+      <div
+        key={i}
+        className={`p-2 rounded ${
+          msg.type === "user"
+            ? "bg-green-500 text-right"
+            : "bg-gray-700"
+        }`}
+      >
+        {msg.text}
+      </div>
+    ))}
+  </div>
+
+  {/* Input */}
+  <div className="flex gap-2">
+    <input
+      className="flex-1 p-2 rounded bg-white/20"
+      value={question}
+      onChange={(e) => setQuestion(e.target.value)}
+      placeholder="Ask something from document..."
+    />
+
+    <button
+      onClick={handleAsk}
+      className="px-4 bg-blue-500 rounded"
+    >
+      Ask
+    </button>
+  </div>
+</div>
     </div>
   );
 }
